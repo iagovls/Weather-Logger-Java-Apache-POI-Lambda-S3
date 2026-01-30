@@ -3,8 +3,13 @@ package com.weatherToS3;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import java.util.Map;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
+
+
+import org.apache.poi.ss.usermodel.Sheet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.services.s3.S3Client;
 
 /**
  * Lambda function entry point. You can change to use other pojo type or implement
@@ -12,21 +17,42 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
  *
  * @see <a href=https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html>Lambda Java Handler</a> for more information
  */
-public class App implements RequestHandler<Map<String, String>, String> {
-    private final S3AsyncClient s3Client;
+public class App implements RequestHandler<ScheduledEvent, String> {
+    private final S3Client s3Client;
+    Logger logger = LoggerFactory.getLogger(App.class);
 
     public App() {
         // Initialize the SDK client outside of the handler method so that it can be reused for subsequent invocations.
         // It is initialized when the class is loaded.
         s3Client = DependencyFactory.s3Client();
         // Consider invoking a simple api here to pre-warm up the application, eg: dynamodb#listTables
+        logger = LoggerFactory.getLogger(App.class);
     }
 
     @Override
-    public String handleRequest(final Map<String, String> input, final Context context) {
+    public String handleRequest(final ScheduledEvent event, final Context context) {
         LambdaLogger lambdaLogger = context.getLogger();
         lambdaLogger.log("Start to handle request");
         // TODO: invoking the api call using s3Client.
-        return "";
+        WeatherData data = new WeatherData();
+        S3ExcelService s3 = new S3ExcelService();
+        String fileName = "Data.xls";
+        String sheetName = "Temperatures";
+        String bucket = System.getenv("bucket_name");
+
+        try {
+            lambdaLogger.log("Getting actual temp");
+            Double actualTemp = data.getActualTemp();
+
+            s3.loadWorkbookFromS3OrCreateIfNotExists(bucket, fileName);
+            Sheet sheet = s3.getSheetOrCreateIfNotExists(sheetName);
+            s3.writeHeader(sheet);
+            s3.writeTempInSheet(sheet, 1, actualTemp);
+            s3.saveWorkbookToS3(bucket, fileName);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        lambdaLogger.log("End of application.");
+        return "Ok";
     }
 }
