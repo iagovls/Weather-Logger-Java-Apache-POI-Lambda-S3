@@ -11,12 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.services.s3.S3Client;
 
-/**
- * Lambda function entry point. You can change to use other pojo type or implement
- * a different RequestHandler.
- *
- * @see <a href=https://docs.aws.amazon.com/lambda/latest/dg/java-handler.html>Lambda Java Handler</a> for more information
- */
 public class App implements RequestHandler<ScheduledEvent, String> {
     private final S3Client s3Client;
     Logger logger = LoggerFactory.getLogger(App.class);
@@ -33,7 +27,6 @@ public class App implements RequestHandler<ScheduledEvent, String> {
     public String handleRequest(final ScheduledEvent event, final Context context) {
         LambdaLogger lambdaLogger = context.getLogger();
         lambdaLogger.log("Start to handle request");
-        // TODO: invoking the api call using s3Client.
         WeatherData data = new WeatherData();
         S3ExcelService s3 = new S3ExcelService();
         String fileName = "Data.xls";
