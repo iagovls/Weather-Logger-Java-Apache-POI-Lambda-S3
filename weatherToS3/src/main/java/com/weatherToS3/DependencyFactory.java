@@ -5,6 +5,10 @@ import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsPro
 import software.amazon.awssdk.http.crt.AwsCrtAsyncHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import tools.jackson.databind.ObjectMapper;
+
+import java.net.http.HttpClient;
 
 /**
  * The module containing all dependencies required by the {@link App}.
@@ -16,11 +20,9 @@ public class DependencyFactory {
     /**
      * @return an instance of S3AsyncClient
      */
-    public static S3AsyncClient s3Client() {
-        return S3AsyncClient.builder()
-                       .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
-                       .region(Region.US_EAST_1)
-                       .httpClientBuilder(AwsCrtAsyncHttpClient.builder())
-                       .build();
+    public static S3Client s3Client() {
+        return S3Client.create();
     }
+
+
 }
