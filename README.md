@@ -42,7 +42,7 @@ O arquivo gerado é `.xls` (Apache POI `HSSFWorkbook`), com as colunas:
 
 ### 1) OpenWeather
 
-Acesse <a href="https://openweathermap.org/api" target="blank"> https://openweathermap.org/api </a>
+Acesse <a href="https://openweathermap.org/api" target="_blank"> https://openweathermap.org/api </a>
 
 ### 2) AWS
 
