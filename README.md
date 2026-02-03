@@ -38,18 +38,36 @@ O arquivo gerado é `.xls` (Apache POI `HSSFWorkbook`), com as colunas:
 - `Data e horário` (formato `dd/MM/yyyy HH:mm`)
 - `Temperatura`
 
-## Requisitos
-
-- Java 21
-- Maven 3.9+
-- Conta AWS com permissão para ler/gravar no S3
-- API key da OpenWeather
-
 ## Configuração
 
-### 1) OpenWeather (weather.properties)
+### 1) OpenWeather
 
-Crie o arquivo `src/main/resources/weather.properties` (ele já está no `.gitignore` para evitar vazamento de credenciais).
+Acesse <a href="https://openweathermap.org/api" target="blank"> https://openweathermap.org/api </a>
+
+### 2) AWS
+
+Acesse o AWS Lambda e crie uma nova função com Java 21.
+
+Você precisará fazer o upload do código como um arquivo `.jar`. Para isso rode o comando:
+
+```Bash
+mvn clean package
+```
+
+O arquivo estará pronto em `weatherToS3/target/weatherToS3.jar`.
+
+Após subir o arquivo `.jar`, em Configurações de tempo de execução, clique em editar.
+E em Manipulador, escreva o código abaixo que se refere ao caminho do método handleRequest().
+
+```java
+com.weatherToS3.App::handleRequest
+```
+
+Após essa configuração, acesse a aba `Configuração` e acesse `Permissões` para adicionar acesso a AWS S3.
+Para isso você pode clicar no link para a função IAM para acessá-la diretamente.
+Clicar em adicionar permissões e anexar políticas.
+Procurar por `AmazonS3FullAccess` e adicionar permissões.
+
 
 Você pode usar o template:
 - Copie `src/main/resources/weather.properties.example` para `src/main/resources/weather.properties`
