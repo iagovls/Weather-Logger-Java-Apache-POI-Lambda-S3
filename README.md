@@ -43,6 +43,7 @@ O arquivo gerado é `.xls` (Apache POI `HSSFWorkbook`), com as colunas:
 ### 1) OpenWeather
 
 Acesse <a href="https://openweathermap.org/api" target="_blank"> https://openweathermap.org/api </a>
+Crie uma conta e se inscreva no `Free Plan` para conseguir uma `api key`.
 
 ### 2) AWS
 
@@ -68,65 +69,40 @@ Para isso você pode clicar no link para a função IAM para acessá-la diretame
 Clicar em adicionar permissões e anexar políticas.
 Procurar por `AmazonS3FullAccess` e adicionar permissões.
 
+Ainda em `Configuração` acesse `Variáveis de Ambiente` e configure as váriaveis necessárias: `base_url`, `lat`, `lon`, `api_key`, `units`, `bucket_name`.
 
-Você pode usar o template:
-- Copie `src/main/resources/weather.properties.example` para `src/main/resources/weather.properties`
-- Preencha `api_key` com sua chave
+- Onde `base_url` é 
+```
+https://api.openweathermap.org/data/2.5/weather
+```
 
-Campos:
-- `base_url`: endpoint da OpenWeather
-- `lat` / `lon`: latitude/longitude
-- `units`: `metric` (Celsius) ou `imperial` (Fahrenheit)
-- `api_key`: sua chave da OpenWeather
+- `lat` e `lon` são as coordenadas do local onde você quer coletar as temperaturas.
 
-### 2) AWS (credenciais e região)
+- `api_key` é a chave obtida na OpenWeather
 
-O projeto usa o AWS SDK v2 (`S3Client.create()`), então ele depende do *Default Credentials Provider Chain*:
-- Variáveis de ambiente `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` (e `AWS_SESSION_TOKEN` se aplicável)
-- Perfil local em `~/.aws/credentials`
-- IAM Role (quando rodando dentro da AWS, ex.: Lambda/EC2)
+- `units` é a unidade de medida você pode escolher entre `standard`, `metric` (Celsius) and `imperial` (Fahrenheit).
 
-Também é necessário definir uma região (exemplos):
-- `AWS_REGION=sa-east-1` (ou a região do seu bucket)
-- ou perfil configurado localmente
+- `bucket_name` é o nome do bucket da S3 em que o arquivo será salvo.
 
-Permissões mínimas no bucket/objeto:
-- `s3:GetObject`
-- `s3:PutObject`
+Após essas configurações, acesse Gatilhos.
+Escolha EventBridge, Criar uma regra, Preencha Nome e Descrição.
+
+Em Expressão de programação digite o código abaixo para a aplicação coletar a temperatura e salvar no S3 a cada 1 hora:
+```
+rate(1 hour)
+```
 
 ## Ajustes rápidos (bucket/arquivo/planilha)
 
-Hoje esses valores estão fixos em [Main.java](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/untitled/src/main/java/org/example/Main.java):
-- `bucket`: `analise-abastecimentos-bucket`
-- `fileName`: `Dados.xls`
-- `sheetName`: `Temperaturas`
+Esses valores estão fixos em [Main.java](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/untitled/src/main/java/org/example/Main.java):
+- `fileName`: `Data.xls`
+- `sheetName`: `Temperatures`
 
 Se necessário, altere ali para apontar para seu bucket e nomes desejados.
 
-## Executando localmente
-
-1) Compilar:
-
-```bash
-mvn clean package
-```
-
-2) Executar:
-
-Como este projeto não empacota as dependências em um único JAR, a forma mais prática é rodar pela sua IDE (executando a classe `com.weatherToS3.Main`).
-
-## Rodando na AWS Lambda (opcional)
-
-A classe [Main.java](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/untitled/src/main/java/org/example/Main.java) implementa `RequestHandler` como base para execução em Lambda, mas o fluxo principal está no método `run()`.
-
-Ao rodar em Lambda:
-- Use uma IAM Role anexada à função com permissão no S3
-- Forneça `weather.properties` no pacote (ou adapte para ler de variáveis de ambiente/Secrets Manager)
 
 ## Estrutura do projeto
 
 - `src/main/java/org/example/Main.java`: orquestra o fluxo (API → Excel → S3)
 - `src/main/java/org/example/WeatherData.java`: busca temperatura na OpenWeather
 - `src/main/java/org/example/S3ExcelService.java`: manipula Excel `.xls` e integra com S3
-- `src/main/resources/weather.properties.example`: modelo de configuração (sem segredo)
-
