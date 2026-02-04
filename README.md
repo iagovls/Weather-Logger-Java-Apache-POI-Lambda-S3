@@ -28,81 +28,91 @@ git clone https://github.com/iagovls/Weather-Logger-Java-Apache-POI-Lambda-S3.gi
 cd weatherToS3
 ```
 
-## Como funciona
+## How it works
 
-O fluxo principal está em `Main.java`
-- Busca a temperatura via `WeatherData.java`
-- Abre/cria o Excel no S3 e escreve na planilha via `S3ExcelService.java`
+The main flow is in `Main.java`
+- Fetches the temperature via `WeatherData.java`
+- Opens/creates an Excel file in S3 and writes to the spreadsheet via `S3ExcelService.java`
 
-O arquivo gerado é `.xls` (Apache POI `HSSFWorkbook`), com as colunas:
+The generated file is `.xls` (Apache POI `HSSFWorkbook`), with the following columns:
 - `Data e horário` (formato `dd/MM/yyyy HH:mm`)
 - `Temperatura`
 
-## Configuração
+## Configuration
 
 ### 1) OpenWeather
 
-Acesse <a href="https://openweathermap.org/api" target="_blank"> https://openweathermap.org/api </a>
-Crie uma conta e se inscreva no `Free Plan` para conseguir uma `api key`.
+Go to <a href="https://openweathermap.org/api" target="_blank"> https://openweathermap.org/api </a>
+Create an account and subscribe on the `Free Plan` to obtain an `API key`.
 
 ### 2) AWS
 
-Acesse o AWS Lambda e crie uma nova função com Java 21.
+Go to AWS Lambda and create a new function using `Java 21`
 
-Você precisará fazer o upload do código como um arquivo `.jar`. Para isso rode o comando:
+You will need to upload the code as a `.jar` file. To do this, run:
 
 ```Bash
 mvn clean package
 ```
 
-O arquivo estará pronto em `weatherToS3/target/weatherToS3.jar`.
+The file will be generated at `weatherToS3/target/weatherToS3.jar`.
 
-Após subir o arquivo `.jar`, em Configurações de tempo de execução, clique em editar.
-E em Manipulador, escreva o código abaixo que se refere ao caminho do método handleRequest().
+After uploading the `.jar` file, go to `Runtime settings`, click `Edit`
+and in `Handler`, enter the code below, which points to the handleRequest() method.
 
 ```java
 com.weatherToS3.App::handleRequest
 ```
 
-Após essa configuração, acesse a aba `Configuração` e acesse `Permissões` para adicionar acesso a AWS S3.
-Para isso você pode clicar no link para a função IAM para acessá-la diretamente.
+After this, go to `Configuration` tab and then `Permissions` to add access to AWS S3.
+You can click the link to the IAM role to open it directly. Then click `Add permissions`, `Attach policies`, search for `AmazonS3FullAccess`, and attach it.
 Clicar em adicionar permissões e anexar políticas.
 Procurar por `AmazonS3FullAccess` e adicionar permissões.
 
-Ainda em `Configuração` acesse `Variáveis de Ambiente` e configure as váriaveis necessárias: `base_url`, `lat`, `lon`, `api_key`, `units`, `bucket_name`.
+Still under `Configuration`, go to `Environment variables` and set the required variables: 
+- `base_url`
+- `lat`
+- `lon`
+- `api_key`
+- `units`
+- `bucket_name`
 
-- Onde `base_url` é 
+Where
+- `base_url`:
 ```
 https://api.openweathermap.org/data/2.5/weather
 ```
 
-- `lat` e `lon` são as coordenadas do local onde você quer coletar as temperaturas.
+- `lat` and `lon` are the coordinates of the location where you want to collect temperatures.
 
-- `api_key` é a chave obtida na OpenWeather
+- `api_key` is a key obtained from OpenWeather.
 
-- `units` é a unidade de medida você pode escolher entre `standard`, `metric` (Celsius) and `imperial` (Fahrenheit).
+- `units` is the measurement unit. You can choose between:
+  - `standard`
+  - `metric` (Celsius)
+  - `imperial` (Fahrenheit).
 
-- `bucket_name` é o nome do bucket da S3 em que o arquivo será salvo.
+- `bucket_name` is the name of the S3 bucket where the file will be saved.
 
-Após essas configurações, acesse Gatilhos.
-Escolha EventBridge, Criar uma regra, Preencha Nome e Descrição.
+After setting these variables, go to `Triggers`.
+Choose `EventBridge`, create a rule, and fill in the `Name` and `Description`
 
-Em Expressão de programação digite o código abaixo para a aplicação coletar a temperatura e salvar no S3 a cada 1 hora:
+In `Schedule expression`, enter the code below so the application collects the temperature and saves it to S3 every 1 hour:
 ```
 rate(1 hour)
 ```
 
-## Ajustes rápidos (bucket/arquivo/planilha)
+## Quick Adjustments (bucket/file/sheet)
 
-Esses valores estão fixos em [Main.java](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/untitled/src/main/java/org/example/Main.java):
+This values are hardcoded in [Main.java](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/untitled/src/main/java/org/example/Main.java):
 - `fileName`: `Data.xls`
 - `sheetName`: `Temperatures`
 
-Se necessário, altere ali para apontar para seu bucket e nomes desejados.
+If needed change them there to point to your derided bucket and names.
 
 
-## Estrutura do projeto
+## Project Structure
 
-- `src/main/java/org/example/Main.java`: orquestra o fluxo (API → Excel → S3)
-- `src/main/java/org/example/WeatherData.java`: busca temperatura na OpenWeather
-- `src/main/java/org/example/S3ExcelService.java`: manipula Excel `.xls` e integra com S3
+- `src/main/java/org/example/Main.java`: orchestrates the flow (API → Excel → S3)
+- `src/main/java/org/example/WeatherData.java`: fetches temperature data from OpenWeather
+- `src/main/java/org/example/S3ExcelService.java`: handles `.xls` files e integrates with S3
