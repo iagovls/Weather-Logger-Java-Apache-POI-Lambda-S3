@@ -39,4 +39,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name storeTempInExcel \
-            --zip-file fileb://target/weatherToS3.jar
+            --zip-file fileb://weatherToS3/target/weatherToS3.jar
