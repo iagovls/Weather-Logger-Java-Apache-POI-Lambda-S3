@@ -32,5 +32,5 @@ jobs:
       - name: Deploy to Lambda
         run: |
           aws lambda update-function-code \
-            --function-name nome-da-sua-lambda \
-            --zip-file fileb://target/seu-jar-ou-zip.zip
+            --function-name storeTempInExcel \
+            --zip-file fileb://target/weatherToS3.jar
