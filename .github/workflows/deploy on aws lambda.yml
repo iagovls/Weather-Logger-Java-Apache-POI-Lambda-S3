@@ -21,7 +21,8 @@ jobs:
 
       - name: Build
         run: |
-          cd .\weatherToS3\ 
+          ls -la
+          cd ./weatherToS3 
           mvn clean package 
 
       - name: Configure AWS Credentials
