@@ -20,7 +20,9 @@ jobs:
           java-version: '17'
 
       - name: Build
-        run: mvn clean package
+        run: |
+          cd .\weatherToS3\ \
+          mvn clean package 
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
