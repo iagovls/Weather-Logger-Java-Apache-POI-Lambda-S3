@@ -45,23 +45,31 @@ public class S3ExcelService  {
         dateTimeHeader.setCellValue("Data e horário");
         Cell tempHeader = row.createCell(1);
         tempHeader.setCellValue("Temperatura");
+        Cell feelsLikeHeader = row.createCell(2);
+        feelsLikeHeader.setCellValue("Sensação térmica");
+        Cell humidityHeader = row.createCell(3);
+        humidityHeader.setCellValue("Umidade");
     }
 
-    public void writeTempInSheet(
+    public void writeDataInSheet(
             Sheet sheet,
             int colPosition,
-            Double value) {
-        ZonedDateTime dateTime = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+            Data values) {
+        ZonedDateTime dateTime = ZonedDateTime.now();
+        Date date = Date.from(dateTime.minusHours(3).toInstant());
 
         CreationHelper helper = workbook.getCreationHelper();
         CellStyle style = workbook.createCellStyle();
         style.setDataFormat(helper.createDataFormat().getFormat("dd/MM/yyyy HH:mm"));
-        Date date = Date.from(dateTime.toInstant());
 
         int nextRowIndex = sheet.getPhysicalNumberOfRows() == 0 ? 0 : sheet.getLastRowNum() + 1;
         Row row = sheet.createRow(nextRowIndex);
         Cell tempCell = row.createCell(colPosition);
-        tempCell.setCellValue(value);
+        tempCell.setCellValue(values.getTemp());
+        Cell feelsLikeCell = row.createCell(colPosition + 1);
+        feelsLikeCell.setCellValue(values.getFeelsLike());
+        Cell humidityCell = row.createCell(colPosition + 2);
+        humidityCell.setCellValue(values.getHumidity());
 
         Cell dateTimeCell = row.createCell(colPosition - 1);
         dateTimeCell.setCellValue(date);

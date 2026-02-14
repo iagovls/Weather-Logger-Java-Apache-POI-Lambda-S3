@@ -11,35 +11,51 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class WeatherData {
+    private String api_key;
+    private String BASE_URL;
+    private String lat;
+    private String lon;
+    private String units;
+    private String url;
+    private HttpClient client;
+    private ObjectMapper mapper;
+    private Logger logger;
+    private Data data;
 
-    @Logging
-    public Double getActualTemp() throws Exception {
-        final HttpClient client = HttpClient.newHttpClient();
-        final ObjectMapper mapper = new ObjectMapper();
-        Logger logger = LoggerFactory.getLogger(WeatherData.class);
+    public WeatherData()
+    {
+        this.client = HttpClient.newHttpClient();
+        this.mapper = new ObjectMapper();
+        this.logger= LoggerFactory.getLogger(WeatherData.class);
 
-        String BASE_URL = System.getenv("base_url");
+
+        this.BASE_URL = System.getenv("base_url");
         if (BASE_URL == null || BASE_URL.isEmpty()) {
             throw new IllegalArgumentException("base_url environment variable is not set");
         }
-        String lat = System.getenv("lat");
+        this.lat = System.getenv("lat");
         if (lat == null || lat.isEmpty()) {
             throw new IllegalArgumentException("lat environment variable is not set");
         }
-        String lon = System.getenv("lon");
+        this.lon = System.getenv("lon");
         if (lon == null || lon.isEmpty()) {
             throw new IllegalArgumentException("lon environment variable is not set");
         }
-        String units = System.getenv("units");
+        this.units = System.getenv("units");
         if (units == null || units.isEmpty()) {
             throw new IllegalArgumentException("units environment variable is not set");
         }
-        String api_key = System.getenv("api_key");
+        this.api_key = System.getenv("api_key");
         if (api_key == null || api_key.isEmpty()) {
             throw new IllegalArgumentException("api_key environment variable is not set");
         }
-        String url = BASE_URL + "?lat=" + lat + "&lon=" + lon + "&appid=" + api_key + "&units=" + units;
+        this.url = BASE_URL + "?lat=" + lat + "&lon=" + lon + "&appid=" + api_key + "&units=" + units;
 
+    }
+
+
+    @Logging
+    public Data getActualWeatherData() throws Exception {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(url))
@@ -48,7 +64,12 @@ public class WeatherData {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 JsonNode treeNode = mapper.readTree(response.body());
-                return treeNode.path("main").get("temp").asDouble();
+                this.data = new Data(
+                        treeNode.path("main").get("temp").asDouble(),
+                        treeNode.path("main").get("feels_like").asDouble(),
+                        treeNode.path("main").get("humidity").asInt()
+                );
+                return data;
             } else {
                 logger.info("Error on request OpenWeather. StatusCode: " + response.statusCode());
                 throw new Exception("Erro");
@@ -58,5 +79,7 @@ public class WeatherData {
             throw new RuntimeException(e);
         }
     }
+
+
 }
 

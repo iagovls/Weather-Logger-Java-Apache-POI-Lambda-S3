@@ -29,18 +29,18 @@ public class App implements RequestHandler<ScheduledEvent, String> {
         lambdaLogger.log("Start to handle request");
         WeatherData data = new WeatherData();
         S3ExcelService s3 = new S3ExcelService();
-        String fileName = "Data.xls";
-        String sheetName = "Temperatures";
+        String fileName = "Dados.xls";
+        String sheetName = "Temperaturas";
         String bucket = System.getenv("bucket_name");
 
         try {
             lambdaLogger.log("Getting actual temp");
-            Double actualTemp = data.getActualTemp();
+            Data actualWeatherData = data.getActualWeatherData();
 
             s3.loadWorkbookFromS3OrCreateIfNotExists(bucket, fileName);
             Sheet sheet = s3.getSheetOrCreateIfNotExists(sheetName);
             s3.writeHeader(sheet);
-            s3.writeTempInSheet(sheet, 1, actualTemp);
+            s3.writeDataInSheet(sheet, 1, actualWeatherData);
             s3.saveWorkbookToS3(bucket, fileName);
         } catch (Exception e) {
             throw new RuntimeException(e);
