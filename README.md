@@ -102,6 +102,13 @@ In `Schedule expression`, enter the code below so the application collects the t
 rate(1 hour)
 ```
 
+## CI/CD: Deploy to AWS Lambda
+
+This repository uses GitHub Actions to build the Java Lambda and deploy it to AWS on every push to the `master` branch.
+
+- Workflow file: [.github/workflows/deploy on aws lambda.yml](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/Weather%20Logger%20-%20Java%20+%20Apache%20POI%20+%20Lambda%20+%20S3/.github/workflows/deploy%20on%20aws%20lambda.yml)
+- Status badge: <img src="https://github.com/%3Ciagovls%3E/%3CWeather-Logger-Java-Apache-POI-Lambda-S3%3E/actions/workflows/deploy%20on%20aws%20lambda.yml/badge.svg?branch=master" alt="Deploy Lambda"/>:
+
 ## Quick Adjustments (bucket/file/sheet)
 
 This values are hardcoded in [Main.java](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/untitled/src/main/java/org/example/Main.java):
