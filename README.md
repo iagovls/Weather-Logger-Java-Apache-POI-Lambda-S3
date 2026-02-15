@@ -107,7 +107,7 @@ rate(1 hour)
 This repository uses GitHub Actions to build the Java Lambda and deploy it to AWS on every push to the `master` branch.
 
 - Workflow file: [.github/workflows/deploy on aws lambda.yml](file:///c:/Users/Iagov/OneDrive/Documentos/GitHub/Weather%20Logger%20-%20Java%20+%20Apache%20POI%20+%20Lambda%20+%20S3/.github/workflows/deploy%20on%20aws%20lambda.yml)
-- Status badge: <img src="https://github.com/%3Ciagovls%3E/%3CWeather-Logger-Java-Apache-POI-Lambda-S3%3E/actions/workflows/deploy%20on%20aws%20lambda.yml/badge.svg?branch=master" alt="Deploy Lambda"/>:
+- Status badge: [![Deploy Lambda](https://github.com/iagovls/Weather-Logger-Java-Apache-POI-Lambda-S3/actions/workflows/deploy%20on%20aws%20lambda.yml/badge.svg?branch=master)](https://github.com/iagovls/Weather-Logger-Java-Apache-POI-Lambda-S3/actions/workflows/deploy%20on%20aws%20lambda.yml):
 
 ## Quick Adjustments (bucket/file/sheet)
 
